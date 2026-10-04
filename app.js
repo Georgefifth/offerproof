@@ -39,6 +39,11 @@ function setLanguage(next) {
 }
 
 function setSample(kind) {
+  currentAnalysis = null;
+  analyzedText = '';
+  clearRecordPreview();
+  $('results').classList.add('hidden');
+  $('verify').classList.add('hidden');
   $('offerText').value = samples[kind];
   $('senderEmail').value = kind === 'risky' ? 'talent.northstar@gmail.com' : 'maya@northstar.example';
   $('officialSite').value = kind === 'risky' ? 'https://northstar.example' : '';

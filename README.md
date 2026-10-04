@@ -10,7 +10,19 @@ Requires Python 3 for the local static server. No install, account, API key, or 
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000`. Run automated checks with `node --test` if Node.js is installed.
+Open `http://localhost:8000`. The published prototype is at [GitHub Pages](https://georgefifth.github.io/offerproof/).
+
+## Test
+
+Run the analysis checks with `npm test`. To drive a headless Firefox through the complete browser flow and save desktop, Chinese, and mobile screenshots to `test-artifacts/`:
+
+```bash
+npm install
+npx playwright install firefox
+npm run test:e2e
+```
+
+The end-to-end test checks examples, warnings, highlighting, domain comparison, the verification checklist, language switching, download content, state reset, and mobile overflow.
 
 ## Demo flow
 
@@ -41,4 +53,4 @@ Sample company names and addresses are fictional. The samples are demonstration 
 
 Created for LovHack Season 3. The implementation in this directory is a new browser prototype. It uses no copied project code or external JS/CSS dependencies. The safety guidance is derived from the credited sources above. Do not state that the tool was tested with real job seekers or has a measured detection accuracy; neither claim has been established.
 
-The event requires a 2–3 minute demo video and a working prototype link. See `DEMO.md` for a draft script. Publishing or submitting this project is a separate user action.
+The event requires a 2–3 minute demo video and a working prototype link. See `DEMO.md` for a draft script. Submission to Devpost remains a separate user action.
