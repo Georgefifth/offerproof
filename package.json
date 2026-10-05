@@ -4,11 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "test": "node --test analysis.test.js",
+    "test": "node --test analysis.test.js tests/analysis-corpus.test.js",
     "test:e2e": "node tests/firefox-flow.mjs",
     "start": "python3 -m http.server 8000"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "playwright": "^1.63.0"
   }
 }

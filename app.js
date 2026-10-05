@@ -1,4 +1,5 @@
-import { analyzeOffer, senderCheck, redactForExport } from './analysis.js';
+import { analyzeOffer, senderCheck, reviewState } from './analysis.js';
+import { createRecord } from './record.js';
 
 const $ = id => document.getElementById(id);
 const text = (id, value) => { $(id).textContent = value; };
@@ -13,18 +14,68 @@ const translations = {
 
 translations.en.domainNoEmail = 'No sender email was provided. Use the independently found website and contact check instead.';
 translations.zh.domainNoEmail = '没有发件人邮箱。请改用独立找到的官网和联系方式核实。';
+Object.assign(translations.en, {
+  tryExample: 'TRY A FICTIONAL EXAMPLE', recoveryCountry: 'OFFICIAL HELP IN YOUR COUNTRY', chooseCountry: 'Choose your country', countryMY: 'Malaysia', countrySG: 'Singapore', countryUS: 'United States', countryOther: 'Other country', officialHelp: 'Official guidance ↗',
+  recoveryMY: 'Malaysia: contact your bank immediately. Call NSRC 997 for online financial scam response.', recoverySG: 'Singapore: contact your bank immediately. Call ScamShield 1799 for advice and reporting guidance.', recoveryUS: 'United States: contact your bank or payment provider immediately. Report the incident to the FTC; use IdentityTheft.gov if identity information was shared.', recoveryOther: 'Contact your bank or payment provider immediately. Find your country’s official police or government fraud reporting service independently.',
+  taskSample: 'Task job ↗', continueCheck: 'Continue to the independent check ↓', messageEvidence: 'WHOLE MESSAGE WITH HIGHLIGHTS',
+  missingSite: 'You marked the checks complete. Add the official website you found independently to finish this record.', invalidInputs: 'Correct the email or website field above before completing this record.',
+  limit: 'This paste exceeds 20,000 characters. Shorten it before pasting; your existing message was kept unchanged.',
+  skip: 'Skip to the offer checker', reset: 'Clear this review', resetConfirm: 'Clear the message, checks, and notes in this tab?', cleared: 'Review cleared.', changed: 'Message changed. Examine it again to update the results.',
+  export: 'Review & export record ↓', download: 'Download .txt', copyRecord: 'Copy record', copied: 'Copied.', copyFallback: 'Text selected. Press Ctrl+C or ⌘C to copy.', reviewBeforeSharing: 'Review this record before sharing it. Redaction is limited.',
+  recordPreviewLabel: 'YOUR RECORD — REVIEW BEFORE SHARING', notesSummary: 'Add evidence notes (optional)', notesLabel: 'WHAT DID YOU CHECK?', notesHint: 'Notes stay in this tab. Avoid identity numbers or passwords. Exports redact common contacts and keep only the domain of links.', notesPlaceholder: 'Official role page, confirmation date, or how you contacted the employer…',
+  questions: 'Prepare questions for the employer', questionsHint: 'Use contact details you found independently.', questionsLabel: 'QUESTIONS FOR THE OFFICIAL CONTACT', copyQuestions: 'Copy questions',
+  questionTemplate: 'Hello, I found your contact details independently on your official website. Could you please confirm:\n\n1. Is this specific role currently open at your company?\n2. Is the person who contacted me authorized to recruit for it?\n3. What is the official interview and onboarding process, including any request for payment or documents?\n\nI will wait for confirmation before sending money or identity documents. Thank you.',
+  progress: n => `${n} of 3 checks recorded`, moreEvidence: n => `${n} more matching passage${n === 1 ? '' : 's'}`,
+  verdictConfirmed: 'Your independent checks are recorded.', verdictConfirmedCopy: 'You marked all three checks complete. Keep the supporting evidence. This remains your own report, not employer verification by OfferProof.',
+  verdictDomainReview: 'Checks recorded; the sender domain still needs context.', verdictDomainReviewCopy: 'You marked recruiter confirmation complete. Keep the company’s response explaining the separate or personal email domain; OfferProof cannot verify that relationship.',
+  verdictReview: 'Checks recorded; warning signs remain.', verdictReviewCopy: 'Review the warning passages with the employer through its official contact. Completed boxes do not remove these concerns.',
+  domainInvalidUrl: 'Enter a public website domain without login details, such as https://company.com.',
+  domainMismatch: (a,b) => `The sender domain ${a} differs from ${b}. An agency or hiring portal may use a different domain; confirm the connection through the company’s official contact.`
+});
+Object.assign(translations.zh, {
+  tryExample: '试试虚构示例', recoveryCountry: '所在国家的官方求助渠道', chooseCountry: '选择所在国家', countryMY: '马来西亚', countrySG: '新加坡', countryUS: '美国', countryOther: '其他国家', officialHelp: '官方指引 ↗',
+  recoveryMY: '马来西亚：立即联系银行。拨打 NSRC 997 寻求网络金融诈骗的紧急响应。', recoverySG: '新加坡：立即联系银行。拨打 ScamShield 1799 获取建议及举报指引。', recoveryUS: '美国：立即联系银行或支付平台，并向 FTC 举报。如已泄露身份资料，可使用 IdentityTheft.gov。', recoveryOther: '立即联系银行或支付平台，并独立查找所在国家的警方或政府官方诈骗举报渠道。',
+  taskSample: '任务兼职 ↗', continueCheck: '继续独立核验 ↓', messageEvidence: '查看完整原文和高亮',
+  missingSite: '你已标记完成核验，请填写独立找到的官网，以完成这份记录。', invalidInputs: '完成记录之前，请先修正上方的邮箱或官网地址。',
+  limit: '这次粘贴超过20,000字，请缩短后重新粘贴。原有内容未被替换。',
+  skip: '跳到邀约检查', reset: '清空本次核验', resetConfirm: '清空这个标签页中的邀约、勾选项和笔记？', cleared: '本次核验已清空。', changed: '原文已修改，请重新检查以更新结果。',
+  export: '查看及导出核验记录 ↓', download: '下载 .txt', copyRecord: '复制记录', copied: '已复制。', copyFallback: '文字已选中，请按 Ctrl+C 或 ⌘C 复制。', reviewBeforeSharing: '分享前请检查这份记录，自动遮盖的范围有限。',
+  recordPreviewLabel: '核验记录 — 分享前请检查', notesSummary: '添加核验证据笔记（选填）', notesLabel: '你核实了什么？', notesHint: '笔记只留在这个标签页。不要填证件号码或密码。导出时会遮盖常见联系方式，链接只保留域名。', notesPlaceholder: '官方岗位页面、确认日期，或你联系雇主的方式……',
+  questions: '准备向雇主核实的问题', questionsHint: '请使用独立找到的联系方式。', questionsLabel: '发给官方联系人的问题', copyQuestions: '复制问题',
+  questionTemplate: '您好，我独立从贵公司的官网找到了联系方式。请帮忙确认：\n\n1. 贵公司目前是否正在招聘这个具体岗位？\n2. 联系我的人员是否获授权招聘该岗位？\n3. 正式面试和入职流程是什么？其中是否涉及付款或提交资料？\n\n得到确认之前，我会先暂停付款或发送身份证明资料。谢谢。',
+  progress: n => `已记录 ${n} / 3 项核验`, moreEvidence: n => `另外 ${n} 处匹配原文`,
+  verdictConfirmed: '已记录你的独立核验。', verdictConfirmedCopy: '你标记完成了三项核验，请保留支持证据。这是你自己的记录，并非 OfferProof 已验证雇主身份。',
+  verdictDomainReview: '核验已记录，仍需保留域名差异的解释。', verdictDomainReviewCopy: '你已标记确认招聘人员身份。请保留公司对不同域名或私人邮箱的正式说明；OfferProof 无法验证双方关系。',
+  verdictReview: '核验已记录，风险线索仍需确认。', verdictReviewCopy: '请通过雇主的官方渠道确认这些原文线索。完成勾选不会消除疑点。',
+  domainInvalidUrl: '请输入不含登录资料的公开网站域名，例如 https://company.com。',
+  domainMismatch: (a,b) => `发件域名 ${a} 与 ${b} 不同。招聘代理或招聘平台可能使用不同域名，请通过公司官方渠道确认双方关系。`
+});
 
 const samples = {
-  risky: `Hello! We are delighted to offer you a remote student assistant position at Northstar Studio. You can earn $300 per day with no experience. Please contact our recruiter on Telegram for the next step. To activate your position, pay a refundable training fee of $75 today. Send your passport and bank account details before your interview so we can prepare payroll.`,
-  ordinary: `Hello, thank you for applying for the summer design internship at Northstar Studio. We would like to schedule a 30-minute interview next Tuesday. Please confirm your availability. You can review the role on our careers page. We will not request payment or financial documents during the interview process.`
+  en: {
+    risky: 'Hello! We are delighted to offer you a remote student assistant position at Northstar Studio. You can earn $300 per day with no experience. Please contact our recruiter on Telegram for the next step. To activate your position, pay a refundable training fee of $75 today. Send your passport and bank account details before your interview so we can prepare payroll.',
+    ordinary: 'Hello, thank you for applying for the summer design internship at Northstar Studio. We would like to schedule a 30-minute interview next Tuesday. Please confirm your availability. You can review the role on our careers page. We will not request payment or financial documents during the interview process.',
+    task: 'We are hiring students to rate products online for Northstar Studio. To continue, deposit $100 in USDT to unlock your next tasks and withdraw your commission. The balance shown in the app will be released after this payment.'
+  },
+  zh: {
+    risky: '你好！北辰工作室邀请你担任远程学生助理，零经验也能轻松日赚高薪。请添加 Telegram 联系人进行面试。请先交75元培训费，激活后即可上岗。请在面试前提交护照和银行账号，以便提前准备工资。',
+    ordinary: '你好，感谢你申请北辰工作室的暑期设计实习。我们想在下周二安排一次30分钟面试，请确认方便的时间。你可以独立在我们的官网招聘页查看岗位。我们不会要求你支付培训费，也不会在面试前索取身份证或银行账号。',
+    task: '北辰工作室招募学生兼职，在平台上评价商品。请先充值500元USDT，解锁下一组任务并提现佣金。平台显示的收益会在完成充值后到账。'
+  }
 };
 
 let language = 'en';
 let currentAnalysis = null;
 let analyzedText = '';
+let verificationInputs = { sender: '', host: undefined };
 const t = () => translations[language];
+function inputFeedback(key = '') {
+  $('inputStatus').dataset.key = key; text('inputStatus', key ? t()[key] : '');
+  if (['empty', 'limit'].includes(key)) $('offerText').setCustomValidity(t()[key]);
+}
 
 function setLanguage(next) {
+  const hadRecord = !$('recordPreview').classList.contains('hidden');
   language = next;
   document.documentElement.lang = next === 'zh' ? 'zh-CN' : 'en';
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -33,29 +84,51 @@ function setLanguage(next) {
   });
   Object.entries(t().placeholders).forEach(([id, value]) => { $(id).placeholder = value; });
   $('langToggle').textContent = next === 'en' ? '中文' : 'English';
+  $('langToggle').setAttribute('aria-label', next === 'en' ? 'Switch to Chinese' : '切换为英文');
+  $('evidenceNotes').placeholder = t().notesPlaceholder;
+  $('results').setAttribute('aria-label', next === 'en' ? 'Analysis results' : '检查结果');
+  $('verify').setAttribute('aria-label', next === 'en' ? 'Independent verification' : '独立核验');
+  $('highlightedMessage').setAttribute('aria-label', next === 'en' ? 'Message evidence' : '原文证据');
+  $('questionsText').value = t().questionTemplate;
+  $('questionsStatus').textContent = '';
+  if ($('inputStatus').dataset.key) inputFeedback($('inputStatus').dataset.key);
   if (currentAnalysis) renderAnalysis();
   renderDomain();
   renderVerdict();
+  renderRecovery();
+  if (hadRecord && currentAnalysis) prepareRecord(false);
 }
 
 function setSample(kind) {
   currentAnalysis = null;
   analyzedText = '';
+  $('evidenceNotes').value = '';
+  inputFeedback();
+  $('offerText').setCustomValidity('');
+  $('questionsPanel').classList.add('hidden');
+  $('questionsBtn').setAttribute('aria-expanded', 'false');
+  document.querySelector('.evidence-details').open = false;
   clearRecordPreview();
   $('results').classList.add('hidden');
   $('verify').classList.add('hidden');
-  $('offerText').value = samples[kind];
-  $('senderEmail').value = kind === 'risky' ? 'talent.northstar@gmail.com' : 'maya@northstar.example';
-  $('officialSite').value = kind === 'risky' ? 'https://northstar.example' : '';
+  $('offerText').value = samples[language][kind];
+  $('senderEmail').value = kind === 'risky' ? 'talent.northstar@gmail.com' : kind === 'ordinary' ? 'maya@northstar.example' : '';
+  $('officialSite').value = kind !== 'ordinary' ? 'https://northstar.example' : '';
   ['checkSite','checkRole','checkContact'].forEach(id => { $(id).checked = false; });
+  syncVerificationInputs();
   updateCount();
   $('offerText').focus();
+}
+
+function syncVerificationInputs() {
+  verificationInputs = { sender: $('senderEmail').value.trim().toLowerCase(), host: senderCheck('', $('officialSite').value).officialDomain };
 }
 
 function updateCount() {
   $('charCount').textContent = `${$('offerText').value.length.toLocaleString()} / 20,000`;
   if (currentAnalysis && $('offerText').value !== analyzedText) {
     currentAnalysis = null;
+    inputFeedback('changed');
     $('recordPreview').classList.add('hidden');
     $('recordText').value = '';
     ['checkSite','checkRole','checkContact'].forEach(id => { $(id).checked = false; });
@@ -72,7 +145,7 @@ function clearRecordPreview() {
 function appendHighlighted(textValue, findings) {
   const target = $('highlightedMessage');
   target.replaceChildren();
-  const spans = findings.map(f => ({ start: f.start, end: f.end })).sort((a,b) => a.start - b.start);
+  const spans = findings.flatMap(f => f.evidence || [f]).map(f => ({ start: f.start, end: f.end })).sort((a,b) => a.start - b.start);
   const merged = [];
   for (const span of spans) {
     const last = merged.at(-1);
@@ -113,7 +186,17 @@ function renderAnalysis() {
     const quote = document.createElement('blockquote'); quote.className = 'quote'; quote.textContent = `“${f.quote}”`;
     const action = document.createElement('p'); action.textContent = language === 'en' ? f.actionEn : f.actionZh;
     const source = document.createElement('a'); source.href = f.source; source.target = '_blank'; source.rel = 'noopener noreferrer'; source.textContent = language === 'en' ? 'Source guidance ↗' : '查看来源指引 ↗';
-    card.append(head, quote, action, source); list.append(card);
+    card.append(head, quote);
+    if (f.evidence?.length > 1) {
+      const details = document.createElement('details');
+      const summary = document.createElement('summary'); summary.textContent = t().moreEvidence(f.evidence.length - 1);
+      details.append(summary);
+      for (const item of f.evidence.slice(1)) {
+        const extra = document.createElement('blockquote'); extra.className = 'quote'; extra.textContent = `“${item.quote}”`; details.append(extra);
+      }
+      card.append(details);
+    }
+    card.append(action, source); list.append(card);
   }
   if (!findings.length) {
     const empty = document.createElement('div'); empty.className = 'finding-card'; empty.textContent = t().noFindings; list.append(empty);
@@ -149,58 +232,115 @@ function renderVerdict() {
   if (!currentAnalysis) return;
   const domain = senderCheck($('senderEmail').value, $('officialSite').value);
   const checks = ['checkSite','checkRole','checkContact'].every(id => $(id).checked);
-  const state = currentAnalysis.stopCount ? 'Pause' : domain.status === 'mismatch' || domain.status === 'personal' ? 'Mismatch' : checks && domain.officialDomain ? 'Confirmed' : 'Unverified';
+  text('checkProgress', t().progress(['checkSite','checkRole','checkContact'].filter(id => $(id).checked).length));
+  const state = reviewState(currentAnalysis, domain, checks);
+  document.querySelector('.verdict').className = `verdict panel state-${state.toLowerCase()}`;
   text('verdictTitle', t()[`verdict${state}`]);
-  text('verdictCopy', t()[`verdict${state}Copy`]);
+  const copy = state === 'Unverified' && checks ? (['invalid-email', 'invalid-url'].includes(domain.status) ? t().invalidInputs : t().missingSite) : t()[`verdict${state}Copy`];
+  text('verdictCopy', copy);
 }
 
-function exportRecord() {
+function prepareRecord(focus = true) {
   if (!currentAnalysis) return;
-  const domain = senderCheck($('senderEmail').value, $('officialSite').value);
-  const lines = [
-    'OFFERPROOF — personal review record',
-    `Created: ${new Date().toISOString()}`,
-    'This record does not certify that an offer is genuine or fraudulent.',
-    '',
-    `Warning signs: ${currentAnalysis.findings.length}`,
-    ...currentAnalysis.findings.flatMap(f => [`- ${f.en}: ${redactForExport(f.quote)}`, `  Guidance: ${f.actionEn}`, `  Source: ${f.source}`]),
-    '',
-    `Sender domain check: ${domain.status}`,
-    `Sender domain: ${domain.senderDomain || '(not available)'}`,
-    `Independently found site domain: ${domain.officialDomain || '(not available)'}`,
-    '',
-    'Independent checks (self-reported):',
-    ...[['checkSite','Website found independently'],['checkRole','Role found or confirmed'],['checkContact','Recruiter or offer confirmed via official contact']].map(([id,label]) => `- [${$(id).checked ? 'x' : ' '}] ${label}`),
-    '',
-    'The complete message is intentionally omitted. This record is generated only when you request it.',
-    'Automated redaction is limited. Review the record before sharing it.'
-  ];
-  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
-  $('recordText').value = lines.join('\n');
+  $('recordText').value = createRecord({
+    analysis: currentAnalysis, domain: senderCheck($('senderEmail').value, $('officialSite').value),
+    checks: ['checkSite','checkRole','checkContact'].map(id => $(id).checked), notes: $('evidenceNotes').value,
+    language, verdict: $('verdictTitle').textContent
+  });
   $('recordPreview').classList.remove('hidden');
+  text('recordStatus', t().reviewBeforeSharing);
+  if (focus) $('recordText').focus();
+}
+
+function downloadRecord() {
+  if (!currentAnalysis || !$('recordText').value) return;
+  const blob = new Blob([$('recordText').value], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a'); link.href = url; link.download = 'offerproof-review.txt'; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+async function copyText(id, statusId) {
+  const field = $(id);
+  try { await navigator.clipboard.writeText(field.value); text(statusId, t().copied); }
+  catch { field.focus(); field.select(); text(statusId, t().copyFallback); }
+}
+
+function renderRecovery() {
+  const country = $('recoveryCountry').value;
+  const keys = { my: 'MY', sg: 'SG', us: 'US', other: 'Other' };
+  const urls = {
+    my: 'https://www.malaysia.gov.my/en/categories/safety-community-and-law--order/cybersecurity/nsrc-997-hotline',
+    sg: 'https://www.scamshield.gov.sg/check-for-scams/scamshield-helpline/',
+    us: 'https://reportfraud.ftc.gov/'
+  };
+  text('recoveryLocal', country ? t()[`recovery${keys[country]}`] : '');
+  $('recoveryOfficial').classList.toggle('hidden', !urls[country]);
+  if (urls[country]) $('recoveryOfficial').href = urls[country];
+  else $('recoveryOfficial').removeAttribute('href');
+}
+
+function resetReview() {
+  if (($('offerText').value || $('evidenceNotes').value) && !window.confirm(t().resetConfirm)) return;
+  setSample('ordinary');
+  ['offerText', 'senderEmail', 'officialSite'].forEach(id => { $(id).value = ''; });
+  syncVerificationInputs();
+  updateCount();
+  inputFeedback('cleared');
+  $('offerText').focus();
+}
+
 $('langToggle').addEventListener('click', () => setLanguage(language === 'en' ? 'zh' : 'en'));
 $('loadRisky').addEventListener('click', () => setSample('risky'));
 $('loadOrdinary').addEventListener('click', () => setSample('ordinary'));
+$('loadTask').addEventListener('click', () => setSample('task'));
 $('offerText').addEventListener('input', updateCount);
 $('analyzeBtn').addEventListener('click', () => {
-  analyzedText = $('offerText').value.trim();
-  if (!analyzedText) { $('offerText').focus(); $('offerText').setCustomValidity(t().empty); $('offerText').reportValidity(); return; }
+  if ($('inputStatus').dataset.key === 'limit') { $('offerText').focus(); $('offerText').reportValidity(); return; }
+  analyzedText = $('offerText').value;
+  if (!analyzedText.trim()) { inputFeedback('empty'); $('offerText').focus(); $('offerText').setCustomValidity(t().empty); $('offerText').reportValidity(); return; }
   $('offerText').setCustomValidity('');
+  inputFeedback();
   currentAnalysis = analyzeOffer(analyzedText);
+  $('messageEvidence').open = !matchMedia('(max-width: 800px)').matches;
   renderAnalysis();
-  $('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('resultTitle').focus({ preventScroll: true });
+  $('results').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
 });
-$('offerText').addEventListener('input', () => $('offerText').setCustomValidity(''));
+$('offerText').addEventListener('input', () => {
+  $('offerText').setCustomValidity('');
+  if (['empty', 'cleared', 'limit'].includes($('inputStatus').dataset.key)) inputFeedback();
+});
 ['senderEmail','officialSite'].forEach(id => $(id).addEventListener('input', () => {
-  ['checkSite','checkRole','checkContact'].forEach(checkId => { $(checkId).checked = false; });
+  const host = senderCheck('', $('officialSite').value).officialDomain;
+  const sender = $('senderEmail').value.trim().toLowerCase();
+  if (host !== verificationInputs.host) ['checkSite','checkRole','checkContact'].forEach(checkId => { $(checkId).checked = false; });
+  else if (sender !== verificationInputs.sender) $('checkContact').checked = false;
+  syncVerificationInputs();
   clearRecordPreview();
   renderDomain(); renderVerdict();
 }));
 ['checkSite','checkRole','checkContact'].forEach(id => $(id).addEventListener('change', () => { clearRecordPreview(); renderVerdict(); }));
-$('exportBtn').addEventListener('click', exportRecord);
+$('exportBtn').addEventListener('click', () => prepareRecord());
+$('downloadBtn').addEventListener('click', downloadRecord);
+$('copyRecord').addEventListener('click', () => copyText('recordText', 'recordStatus'));
+$('copyQuestions').addEventListener('click', () => copyText('questionsText', 'questionsStatus'));
+$('evidenceNotes').addEventListener('input', clearRecordPreview);
+$('recoveryCountry').addEventListener('change', renderRecovery);
+$('resetBtn').addEventListener('click', resetReview);
+$('questionsBtn').addEventListener('click', () => {
+  const open = $('questionsPanel').classList.toggle('hidden') === false;
+  $('questionsBtn').setAttribute('aria-expanded', String(open));
+  if (open) { $('questionsStatus').textContent = ''; $('questionsText').value = t().questionTemplate; $('questionsText').focus(); }
+});
+$('offerText').addEventListener('paste', event => {
+  const value = event.clipboardData?.getData('text/plain');
+  if (value == null) return;
+  const field = $('offerText');
+  const length = field.value.length - (field.selectionEnd - field.selectionStart) + value.length;
+  if (length > field.maxLength) { event.preventDefault(); inputFeedback('limit'); }
+});
+$('offerText').addEventListener('keydown', event => {
+  if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) { event.preventDefault(); $('analyzeBtn').click(); }
+});
 setLanguage('en');

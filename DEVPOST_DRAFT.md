@@ -8,7 +8,7 @@ Students looking for their first internship or part-time job may receive offers 
 
 ## What it does
 
-OfferProof is a browser prototype with a three-step flow. A student pastes a job invitation. The app highlights exact passages matching a small set of documented warning patterns and shows an action and source for each. The student then compares the sender domain with a company site they found independently and works through a self-reported verification checklist. They can download a text record of their review.
+OfferProof is a browser prototype with a three-step flow. A student pastes a job invitation. The app highlights exact passages matching a small set of documented warning patterns, including task payments and requests for verification codes, and shows an action and source for each. The student then compares the sender domain with a company site they found independently and works through a self-reported verification checklist. Optional notes and a question template help them carry out the check. They preview a redacted record before copying or downloading it. Recovery links are available for Malaysia, Singapore, and the US.
 
 It never declares an offer safe or fraudulent. When no phrases match, it still asks the user to verify the employer.
 
@@ -30,11 +30,15 @@ The OfferProof prototype in this directory: bilingual interface, local phrase an
 
 ## Built with
 
-HTML, CSS, JavaScript, Node.js built-in test runner (development only).
+HTML, CSS, JavaScript. Development checks use the Node.js test runner, Playwright Firefox, axe-core, and GitHub Actions. The 58 analysis/report regression examples are synthetic; automated accessibility checks cover four page states. No measured real-world detection accuracy or user study is claimed.
+
+**Working prototype:** https://georgefifth.github.io/offerproof/
+
+**Source:** https://github.com/Georgefifth/offerproof
 
 ## Before submission
 
-- Add a public, working demo URL or clearly explain how judges can run the prototype.
+- Open the public prototype link above and verify the submitted version.
 - Record and link a 2–3 minute video showing the working product.
 - Confirm team eligibility and complete the Devpost form before the deadline.
 - Do not add claims of measured accuracy, real-user testing, or production deployment without evidence.

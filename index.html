@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
   <meta name="theme-color" content="#f8f5ee">
   <meta name="description" content="A private, evidence-first checklist for checking student job and internship offers.">
   <title>OfferProof — Pause before you reply</title>
@@ -10,6 +11,7 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#offerText" data-i18n="skip">Skip to the offer checker</a>
   <div class="shell">
     <header class="topbar">
       <a class="brand" href="#top" aria-label="OfferProof home"><span class="brand-mark">OP<span class="brand-dot">.</span></span><span>OFFERPROOF</span></a>
@@ -29,10 +31,12 @@
         <div class="work-grid">
           <div class="composer panel">
             <label class="field-label" for="offerText" data-i18n="offerLabel">JOB OR INTERNSHIP MESSAGE</label>
-            <textarea id="offerText" maxlength="20000" spellcheck="false" placeholder="Paste the email, text, or job offer here…" aria-describedby="privacyNote"></textarea>
+            <textarea id="offerText" maxlength="20000" spellcheck="false" placeholder="Paste the email, text, or job offer here…" aria-describedby="privacyNote inputStatus"></textarea>
             <div class="composer-footer"><span id="privacyNote" data-i18n="privacy">Your message stays in this browser tab.</span><span id="charCount">0 / 20,000</span></div>
-            <div class="sample-row"><span data-i18n="tryExample">TRY AN EXAMPLE</span><button type="button" class="text-button" id="loadRisky" data-i18n="riskySample">Suspicious offer ↗</button><button type="button" class="text-button" id="loadOrdinary" data-i18n="ordinarySample">Ordinary offer ↗</button></div>
+            <p id="inputStatus" class="input-status" role="status"></p>
+            <div class="sample-row"><span data-i18n="tryExample">TRY A FICTIONAL EXAMPLE</span><button type="button" class="text-button" id="loadRisky" data-i18n="riskySample">Suspicious offer ↗</button><button type="button" class="text-button" id="loadOrdinary" data-i18n="ordinarySample">Ordinary offer ↗</button><button type="button" class="text-button" id="loadTask" data-i18n="taskSample">Task job ↗</button></div>
             <button id="analyzeBtn" class="primary-button" type="button"><span data-i18n="analyze">Examine this offer</span><span aria-hidden="true">↗</span></button>
+            <button id="resetBtn" class="text-button reset-button" type="button" data-i18n="reset">Clear this review</button>
           </div>
           <aside class="side-note panel" aria-label="Before you begin">
             <div class="side-note-icon" aria-hidden="true">✳</div>
@@ -42,30 +46,34 @@
         </div>
       </section>
 
-      <section id="results" class="results hidden" aria-live="polite" aria-label="Analysis results">
-        <div class="section-top"><div><span class="section-kicker" data-i18n="step2">STEP 02 — THE SIGNALS</span><h2 data-i18n="resultTitle">What stands out?</h2></div><span id="findingCount" class="finding-count"></span></div>
+      <section id="results" class="results hidden" aria-label="Analysis results">
+        <div class="section-top"><div><span class="section-kicker" data-i18n="step2">STEP 02 — THE SIGNALS</span><h2 id="resultTitle" tabindex="-1" data-i18n="resultTitle">What stands out?</h2></div><span id="findingCount" class="finding-count"></span></div>
         <div class="result-grid">
-          <div class="result-main"><div id="statusBanner" class="status-banner"></div><div id="findingsList" class="findings-list"></div></div>
-          <div class="message-review panel"><span class="card-kicker" data-i18n="messageEvidence">MESSAGE EVIDENCE</span><div id="highlightedMessage" class="message-text"></div><p class="highlight-note" data-i18n="highlightNote">Highlighted text triggered a warning. Other risks may still be present.</p></div>
+          <div class="result-main"><div id="statusBanner" class="status-banner" role="status"></div><div id="findingsList" class="findings-list"></div><a class="next-step" href="#verify" data-i18n="continueCheck">Continue to the independent check ↓</a></div>
+          <details id="messageEvidence" class="message-review panel" open><summary class="card-kicker" data-i18n="messageEvidence">WHOLE MESSAGE WITH HIGHLIGHTS</summary><div id="highlightedMessage" class="message-text" tabindex="0" aria-label="Message evidence"></div><p class="highlight-note" data-i18n="highlightNote">Highlighted text triggered a warning. Other risks may still be present.</p></details>
         </div>
       </section>
 
-      <section id="verify" class="verify hidden" aria-label="Independent verification">
+      <section id="verify" class="verify hidden" tabindex="-1" aria-label="Independent verification">
         <div class="section-top"><div><span class="section-kicker" data-i18n="step3">STEP 03 — INDEPENDENT CHECK</span><h2 data-i18n="verifyTitle">Check outside the message.</h2></div><div class="section-note" data-i18n="verifyNote">Do not use the contact link or number supplied in the invitation as your only evidence.</div></div>
         <div class="verify-grid">
           <div class="verification-panel panel"><div class="field-grid"><div><label class="field-label" for="senderEmail" data-i18n="emailLabel">SENDER EMAIL</label><input id="senderEmail" type="email" autocomplete="off" placeholder="recruiter@example.com"></div><div><label class="field-label" for="officialSite" data-i18n="siteLabel">OFFICIAL SITE YOU FOUND YOURSELF</label><input id="officialSite" type="url" autocomplete="off" placeholder="https://example.com"></div></div><div id="domainResult" class="domain-result" aria-live="polite"></div><p class="tiny-note" data-i18n="domainCaveat">A matching domain alone does not prove that the message is genuine. A mismatch needs investigation.</p></div>
-          <div class="checklist panel"><span class="card-kicker" data-i18n="checklistLabel">YOUR CHECKLIST</span><label class="check-item"><input type="checkbox" id="checkSite"><span data-i18n="check1">I found the company’s website independently, without opening a link from this message.</span></label><label class="check-item"><input type="checkbox" id="checkRole"><span data-i18n="check2">I found this specific role on the company’s official careers page, or confirmed it directly.</span></label><label class="check-item"><input type="checkbox" id="checkContact"><span data-i18n="check3">I contacted the company using details from its official website and confirmed the recruiter or offer.</span></label></div>
+          <div class="checklist panel"><span class="card-kicker" data-i18n="checklistLabel">YOUR CHECKLIST</span><p id="checkProgress" class="check-progress" role="status"></p><label class="check-item"><input type="checkbox" id="checkSite"><span data-i18n="check1">I found the company’s website independently, without opening a link from this message.</span></label><label class="check-item"><input type="checkbox" id="checkRole"><span data-i18n="check2">I found this specific role on the company’s official careers page, or confirmed it directly.</span></label><label class="check-item"><input type="checkbox" id="checkContact"><span data-i18n="check3">I contacted the company using details from its official website and confirmed the recruiter or offer.</span></label></div>
         </div>
-        <div class="verdict panel"><div><span class="card-kicker" data-i18n="recordLabel">YOUR REVIEW RECORD</span><h3 id="verdictTitle"></h3><p id="verdictCopy"></p></div><button id="exportBtn" class="secondary-button" type="button" data-i18n="export">Download review record ↓</button></div>
-        <div id="recordPreview" class="record-preview panel hidden"><label class="field-label" for="recordText" data-i18n="recordPreviewLabel">REVIEW RECORD — SELECT TO COPY IF DOWNLOADS ARE BLOCKED</label><textarea id="recordText" readonly></textarea></div>
+        <details class="evidence-details panel"><summary data-i18n="notesSummary">Add evidence notes (optional)</summary><div class="details-body"><label class="field-label" for="evidenceNotes" data-i18n="notesLabel">WHAT DID YOU CHECK?</label><textarea id="evidenceNotes" maxlength="1000" aria-describedby="notesHint" placeholder="Official role page, confirmation date, or how you contacted the employer…"></textarea><p id="notesHint" class="tiny-note" data-i18n="notesHint">Notes stay in this tab. Avoid identity numbers or passwords. Exports redact common contacts and keep only the domain of links.</p></div></details>
+        <div class="question-tools"><button id="questionsBtn" class="text-button" type="button" aria-expanded="false" aria-controls="questionsPanel" data-i18n="questions">Prepare questions for the employer</button><span data-i18n="questionsHint">Use contact details you found independently.</span></div>
+        <div id="questionsPanel" class="record-preview panel hidden"><label class="field-label" for="questionsText" data-i18n="questionsLabel">QUESTIONS FOR THE OFFICIAL CONTACT</label><textarea id="questionsText" readonly></textarea><button id="copyQuestions" class="secondary-button" type="button" data-i18n="copyQuestions">Copy questions</button><p id="questionsStatus" class="tiny-note" role="status"></p></div>
+        <div class="verdict panel"><div><span class="card-kicker" data-i18n="recordLabel">YOUR REVIEW RECORD</span><h3 id="verdictTitle"></h3><p id="verdictCopy"></p></div><button id="exportBtn" class="secondary-button" type="button" data-i18n="export">Review &amp; export record ↓</button></div>
+        <div id="recordPreview" class="record-preview panel hidden"><label class="field-label" for="recordText" data-i18n="recordPreviewLabel">REVIEW RECORD — SELECT TO COPY IF DOWNLOADS ARE BLOCKED</label><textarea id="recordText" readonly></textarea><div class="record-actions"><button id="downloadBtn" class="secondary-button" type="button" data-i18n="download">Download .txt</button><button id="copyRecord" class="secondary-button" type="button" data-i18n="copyRecord">Copy record</button></div><p id="recordStatus" class="tiny-note" role="status" data-i18n="reviewBeforeSharing">Review the record before sharing it.</p></div>
       </section>
 
-      <section class="recovery" aria-label="If you already acted"><div class="recovery-icon" aria-hidden="true">!</div><div><span class="card-kicker" data-i18n="recoveryLabel">IF YOU ALREADY SENT MONEY OR DETAILS</span><h2 data-i18n="recoveryTitle">Act now, not after the review.</h2><p data-i18n="recoveryCopy">Contact your bank or payment provider immediately. If you shared a password, change it and secure the account. Use your country's official fraud reporting channel.</p></div><a href="https://consumer.ftc.gov/articles/job-scams" target="_blank" rel="noopener noreferrer" data-i18n="recoveryLink">FTC recovery and reporting ↗</a></section>
+      <section class="recovery" aria-label="If you already acted"><div class="recovery-icon" aria-hidden="true">!</div><div><span class="card-kicker" data-i18n="recoveryLabel">IF YOU ALREADY SENT MONEY OR DETAILS</span><h2 data-i18n="recoveryTitle">Act now, not after the review.</h2><p data-i18n="recoveryCopy">Contact your bank or payment provider immediately. If you shared a password, change it and secure the account. Use your country's official fraud reporting channel.</p></div><div class="recovery-help"><label class="field-label" for="recoveryCountry" data-i18n="recoveryCountry">OFFICIAL HELP IN YOUR COUNTRY</label><select id="recoveryCountry"><option value="" data-i18n="chooseCountry">Choose your country</option><option value="my" data-i18n="countryMY">Malaysia</option><option value="sg" data-i18n="countrySG">Singapore</option><option value="us" data-i18n="countryUS">United States</option><option value="other" data-i18n="countryOther">Other country</option></select><p id="recoveryLocal" role="status"></p><a id="recoveryOfficial" class="hidden" target="_blank" rel="noopener noreferrer" data-i18n="officialHelp">Official guidance ↗</a><a href="https://consumer.ftc.gov/articles/job-scams" target="_blank" rel="noopener noreferrer" data-i18n="recoveryLink">FTC recovery and reporting ↗</a></div></section>
 
       <section class="principles"><div class="principle"><span>01</span><strong data-i18n="p1Title">No magic score</strong><p data-i18n="p1Copy">We show the evidence and leave uncertain cases uncertain.</p></div><div class="principle"><span>02</span><strong data-i18n="p2Title">No hidden upload</strong><p data-i18n="p2Copy">Analysis runs in your browser. The pasted message is not stored.</p></div><div class="principle"><span>03</span><strong data-i18n="p3Title">No shortcut to trust</strong><p data-i18n="p3Copy">Independent employer contact matters more than a polished invitation.</p></div></section>
     </main>
     <footer><span>OFFERPROOF · LOVHACK SEASON 3 PROTOTYPE</span><span><a href="https://consumer.ftc.gov/consumer-alerts/2025/05/college-students-avoid-scammers-while-you-job-hunt" target="_blank" rel="noopener noreferrer">FTC</a> · <a href="https://www.scamwatch.gov.au/types-of-scams/jobs-and-employment-scams" target="_blank" rel="noopener noreferrer">SCAMWATCH</a></span></footer>
   </div>
+  <noscript><p class="panel">Enable JavaScript to analyze the message locally in your browser. No message is sent to a server.</p></noscript>
   <script type="module" src="./app.js"></script>
 </body>
 </html>
