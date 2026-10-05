@@ -6,7 +6,7 @@ const make = (target, text = 'test', include = true) => ({ id: target, target, d
 const config = { archiveName: '123_A2.zip' };
 
 test('rejects traversal, ambiguous paths and Windows reserved names', () => {
-  for (const path of ['../secret.txt', '/root.txt', 'src\\main.py', 'src//main.py', 'src/../main.py', 'CON.txt', 'src/NUL', 'file. ', 'a:b.txt']) assert.equal(cleanPath(path), null, path);
+  for (const path of ['../secret.txt', '/root.txt', 'src\\main.py', 'src//main.py', 'src/../main.py', 'CON.txt', 'src/NUL', 'file. ', 'a:b.txt', '__proto__']) assert.equal(cleanPath(path), null, path);
   assert.equal(cleanPath('src/你好.py'), 'src/你好.py');
 });
 test('exact requirements distinguish case and folders', () => {

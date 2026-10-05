@@ -3,7 +3,7 @@ export const MAX_FILES = 300;
 
 export function cleanPath(path) {
   const value = String(path).trim().normalize('NFC');
-  if (!value || value.startsWith('/') || value.includes('\\') || /[\x00-\x1f<>:"|?*]/u.test(value)) return null;
+  if (!value || value === '__proto__' || value.startsWith('/') || value.includes('\\') || /[\x00-\x1f<>:"|?*]/u.test(value)) return null;
   const parts = value.split('/');
   if (parts.some(part => !part || part === '.' || part === '..' || /[. ]$/u.test(part) || /^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/iu.test(part))) return null;
   return value;
