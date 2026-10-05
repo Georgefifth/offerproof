@@ -24,7 +24,9 @@ npm run test:e2e
 
 The end-to-end test drives actual buttons, keyboard navigation, evidence expansion, domain comparison, selective checklist resets, bilingual examples, report preview/copy/download, clipboard denial, oversized paste, reset confirmation, and mobile layouts. It also checks for unexpected network requests and runs axe on four page states. These automated checks do not establish complete accessibility or real-world detection accuracy.
 
-The 58 analysis/report cases are synthetic regression examples based on documented mechanisms, not a representative collection of real offers. GitHub Actions runs both suites on pushes and pull requests and saves screenshots and audit results for seven days.
+The 66 analysis/report cases are synthetic regression examples based on documented mechanisms, not a representative collection of real offers. GitHub Actions runs both suites on pushes and pull requests and saves screenshots and audit results for seven days.
+
+To run the same synthetic flow against the published Pages build, set `OFFERPROOF_BASE_URL=https://georgefifth.github.io/offerproof/` when running `npm run test:e2e`. Its screenshots and audit results go in `test-artifacts/live/`.
 
 ## Demo flow
 
@@ -40,7 +42,7 @@ Sample company names and addresses are fictional. The samples are demonstration 
 
 - This is a guided check, not a fraud classifier, web reputation service, or employer identity certification.
 - Phrase detection is limited and may miss scams or flag harmless text. A domain match can also be spoofed or compromised. Users should confirm the role and sender through a separately located official contact.
-- The message and optional notes are held only in memory in the open tab. They are not sent to a server or saved to browser storage. Copy and download require explicit clicks. The record omits the complete message, redacts common contact and long-number formats in matched excerpts and notes, and includes domains rather than full email or site addresses. Redaction is limited; review the preview before sharing it. Refreshing or closing the tab clears the review.
+- The message and optional notes are held only in memory in the open tab. They are not sent to a server or saved to browser storage. Copy and download require explicit clicks. The record includes matched excerpts rather than a separate copy of the complete message; a short message may be included in full when the whole passage matches. It redacts common contact and long-number formats in excerpts and notes, and includes domains rather than full email or site addresses. Redaction is limited; review the preview before sharing it. Refreshing or closing the tab clears the review.
 - An identity request after hiring still needs independent confirmation and a secure HR channel. Checklist completion records the user's own checks; it does not certify an employer. Editing the official domain resets all checks; editing the sender resets the contact check.
 - Recovery guidance offers official Malaysia, Singapore, and US links selected by the user. It does not call, report, locate the user, or send messages automatically.
 - Source guidance is linked from the interface. The source pages are external, but the app does not load them automatically.

@@ -5,7 +5,7 @@ const labels = {
     title: 'OFFERPROOF — personal review record', created: 'Created', caveat: 'This record does not certify that an offer is genuine or fraudulent.',
     verdict: 'Review outcome', warnings: 'Warning signs', guidance: 'Guidance', source: 'Source', domainCheck: 'Sender domain check', sender: 'Sender domain', site: 'Independently found site domain',
     checks: 'Independent checks (self-reported)', checkLabels: ['Website found independently', 'Role found or confirmed', 'Recruiter or offer confirmed via official contact'],
-    notes: 'Your evidence notes', missing: '(not available)', omitted: 'The complete message is intentionally omitted. Nothing is saved or uploaded by this app.',
+    notes: 'Your evidence notes', missing: '(not available)', omitted: 'Only matched excerpts and your notes are included; there is no separate copy of the whole message. Nothing is saved or uploaded by this app.',
     redaction: 'Automated redaction is limited. Review this record before sharing it.',
     states: { missing: 'Not entered', 'no-email': 'No sender email; verify via official contact', 'invalid-email': 'Invalid email', 'invalid-url': 'Invalid website', personal: 'Personal email domain', 'needs-official': 'Official site needed', aligned: 'Domains align; not proof of identity', mismatch: 'Domains differ; explanation needed' }
   },
@@ -13,7 +13,7 @@ const labels = {
     title: 'OFFERPROOF — 个人核验记录', created: '生成时间', caveat: '这份记录不能证明邀约真实，也不能认定其为诈骗。',
     verdict: '核验状态', warnings: '风险线索', guidance: '建议行动', source: '来源', domainCheck: '发件域名核对', sender: '发件域名', site: '独立找到的官网域名',
     checks: '独立核验（由你自行标记）', checkLabels: ['独立找到公司官网', '找到或确认具体岗位', '通过官方渠道确认招聘人员或邀约'],
-    notes: '你的核验笔记', missing: '（未提供）', omitted: '完整邀约原文已省略。本工具不会保存或上传内容。',
+    notes: '你的核验笔记', missing: '（未提供）', omitted: '只包含匹配片段和你的笔记，不另附整份原文。本工具不会保存或上传内容。',
     redaction: '自动遮盖的范围有限，分享前请检查这份记录。',
     states: { missing: '未填写', 'no-email': '没有邮箱，请通过官方渠道核实', 'invalid-email': '邮箱格式无效', 'invalid-url': '官网地址无效', personal: '私人邮箱域名', 'needs-official': '需填写独立找到的官网', aligned: '域名一致，不能证明身份', mismatch: '域名不同，需独立确认原因' }
   }

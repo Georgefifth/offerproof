@@ -45,7 +45,15 @@ const cases = [
   ['coffee is not a fee', 'Coffee training and equipment orientation are included in the internship.', null],
   ['ordinary entry-level pay', 'No experience required, pay is $15 per hour.', null],
   ['Chinese code safety', '不要把短信验证码告诉其他人。', null],
-  ['Chinese code request reversed', '请把短信验证码提供给招聘人员。', 'credentials', 'stop']
+  ['Chinese code request reversed', '请把短信验证码提供给招聘人员。', 'credentials', 'stop'],
+  ['no need to pay', 'You do not need to pay a training fee.', null],
+  ['no fee noun statement', 'There is no training fee to pay.', null],
+  ['plural passwords denial', 'We never ask you to send passwords or verification codes.', null],
+  ['passive identity denial', 'You will not be asked to provide your passport before interview.', null],
+  ['plural passports denial', 'We will not request passports before hiring.', null],
+  ['no need contrast still flags', 'You do not need to pay a training fee, but you must pay an equipment deposit.', 'payment', 'stop'],
+  ['no fee does not hide another fee', 'No training fee, only pay the equipment deposit.', 'payment', 'stop'],
+  ['passive denial does not hide conditional demand', 'You will not be hired until you send your password.', 'credentials', 'stop']
 ];
 for (const [name, message, id, level] of cases) {
   test(name, () => {

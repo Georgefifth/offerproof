@@ -119,7 +119,7 @@ export const RULES = [
 // Split contrast clauses as well as sentences so a safety claim cannot hide a later request.
 // Keep dots inside domains, email addresses, and decimals intact for evidence offsets.
 function clauseRanges(text) {
-  const boundaries = /[!?。！？\n；;]|(?<![\p{L}\p{N}])\.(?![\p{L}\p{N}])|(?<=[\p{L}\p{N}])\.(?=\s|$)|(?<=\s)(?:but|however|yet|instead|except)\b|[,，:](?=\s*(?:please|you must|you need|send|pay|deposit|provide|submit|upload|先|请|需|必须|提交|转账|充值))|\band\b(?=\s+(?:please|you must|you need|send|pay|deposit|provide|submit|upload)\b)|但是|不过|然而|可是|但/giu;
+  const boundaries = /[!?。！？\n；;]|(?<![\p{L}\p{N}])\.(?![\p{L}\p{N}])|(?<=[\p{L}\p{N}])\.(?=\s|$)|(?<=\s)(?:but|however|yet|instead|except)\b|[,，:](?=\s*(?:(?:only|just|then|instead)\s+)?(?:please|you must|you need|send|pay|deposit|provide|submit|upload|先|请|需|必须|提交|转账|充值))|\band\b(?=\s+(?:please|you must|you need|send|pay|deposit|provide|submit|upload)\b)|但是|不过|然而|可是|但/giu;
   const ranges = [];
   let start = 0;
   for (const match of text.matchAll(boundaries)) {
@@ -146,13 +146,15 @@ function isExplicitDenial(ruleId, clause, match) {
   // not erase an earlier request, and "won't hire until you pay" is not a denial.
   const prefix = clause.slice(0, match.index + match[0].length + 12);
   const target = ruleId === 'identity'
-    ? '(?:passport|bank|identity|social security|ssn|national id|driver)'
-    : ruleId === 'credentials' ? '(?:password|verification code|one.time code|otp|passcode)'
+    ? '(?:passports?|bank|identity|social security|ssn|national id|driver)'
+    : ruleId === 'credentials' ? '(?:passwords?|verification codes?|one.time codes?|otp|passcodes?)'
     : '(?:payment|fee|deposit|transfer|recharge|task|earning|check|cheque|money|training|equipment)';
   const negation = "(?:never|will not|won't|do not|don't|no need to|not required to)";
-  const verbs = '(?:ask|request|require|charge|pay|send|provide|share|upload|submit|deposit|transfer|recharge|top[ -]?up)';
+  const verbs = '(?:ask(?:ed|s)?|request(?:ed|s)?|require(?:d|s)?|charge(?:d|s)?|pay|send|provide|share|upload|submit|deposit|transfer|recharge|top[ -]?up)';
   const scope = '(?:(?!\\band\\b|\\buntil\\b|\\bunless\\b|[,，;]).){0,60}';
-  const english = new RegExp(`\\b${negation}\\s+(?:ever\\s+)?${verbs}\\b${scope}\\b${target}\\b`, 'iu');
+  const english = new RegExp(`\\b${negation}\\s+(?:ever\\s+)?(?:be\\s+)?(?:need\\s+to\\s+)?${verbs}\\b${scope}\\b${target}\\b`, 'iu');
+  const noFee = /\bno\s+(?:training|equipment|application|registration|activation|processing)\s+fees?\b/giu;
+  const noFeeApplies = ruleId === 'payment' && [...clause.matchAll(noFee)].some(denial => denial.index <= match.index && denial.index + denial[0].length > match.index);
   const chinese = ruleId === 'identity' || ruleId === 'credentials'
     ? /(?:不会|绝不|无需|不需要|请勿|不要)(?:你|您|再|先)?(?:要求|索取|提交|提供|发送|上传|分享).{0,20}(?:身份证|银行卡|护照|银行账号|密码|验证码)/u
     : /(?:不会|绝不|无需|不需要|请勿|不要)(?:你|您|再|先)?(?:要求.{0,6})?(?:付款|交费|收费|交|付|缴|转账|充值|垫付).{0,20}(?:费|金|款|钱|任务|佣金|收益|支票)/u;
@@ -160,7 +162,7 @@ function isExplicitDenial(ruleId, clause, match) {
   const suffixDenial = /(?:training|equipment|application|registration).{0,15}fee.{0,12}(?:not required|not needed|not payable)/iu;
   const suffix = suffixDenial.exec(clause);
   const suffixApplies = suffix && suffix.index <= match.index + match[0].length && suffix.index + suffix[0].length >= match.index;
-  return english.test(prefix) || chinese.test(prefix) || reversedChinese || (ruleId === 'payment' && suffixApplies);
+  return english.test(prefix) || chinese.test(prefix) || reversedChinese || noFeeApplies || (ruleId === 'payment' && suffixApplies);
 }
 
 function isLaterOnboarding(clause) {

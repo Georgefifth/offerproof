@@ -15,12 +15,13 @@ const translations = {
 translations.en.domainNoEmail = 'No sender email was provided. Use the independently found website and contact check instead.';
 translations.zh.domainNoEmail = '没有发件人邮箱。请改用独立找到的官网和联系方式核实。';
 Object.assign(translations.en, {
+  privateDesign: 'PRIVATE BY DESIGN', recoveryJump: 'Already sent money or details? Get help ↓',
   tryExample: 'TRY A FICTIONAL EXAMPLE', recoveryCountry: 'OFFICIAL HELP IN YOUR COUNTRY', chooseCountry: 'Choose your country', countryMY: 'Malaysia', countrySG: 'Singapore', countryUS: 'United States', countryOther: 'Other country', officialHelp: 'Official guidance ↗',
   recoveryMY: 'Malaysia: contact your bank immediately. Call NSRC 997 for online financial scam response.', recoverySG: 'Singapore: contact your bank immediately. Call ScamShield 1799 for advice and reporting guidance.', recoveryUS: 'United States: contact your bank or payment provider immediately. Report the incident to the FTC; use IdentityTheft.gov if identity information was shared.', recoveryOther: 'Contact your bank or payment provider immediately. Find your country’s official police or government fraud reporting service independently.',
   taskSample: 'Task job ↗', continueCheck: 'Continue to the independent check ↓', messageEvidence: 'WHOLE MESSAGE WITH HIGHLIGHTS',
   missingSite: 'You marked the checks complete. Add the official website you found independently to finish this record.', invalidInputs: 'Correct the email or website field above before completing this record.',
   limit: 'This paste exceeds 20,000 characters. Shorten it before pasting; your existing message was kept unchanged.',
-  skip: 'Skip to the offer checker', reset: 'Clear this review', resetConfirm: 'Clear the message, checks, and notes in this tab?', cleared: 'Review cleared.', changed: 'Message changed. Examine it again to update the results.',
+  skip: 'Skip to the offer checker', reset: 'Clear this review', resetConfirm: 'Clear the message, checks, and notes in this tab?', replaceConfirm: 'Replace your message and evidence notes with this fictional example?', cleared: 'Review cleared.', changed: 'Message changed. Examine it again to update the results.',
   export: 'Review & export record ↓', download: 'Download .txt', copyRecord: 'Copy record', copied: 'Copied.', copyFallback: 'Text selected. Press Ctrl+C or ⌘C to copy.', reviewBeforeSharing: 'Review this record before sharing it. Redaction is limited.',
   recordPreviewLabel: 'YOUR RECORD — REVIEW BEFORE SHARING', notesSummary: 'Add evidence notes (optional)', notesLabel: 'WHAT DID YOU CHECK?', notesHint: 'Notes stay in this tab. Avoid identity numbers or passwords. Exports redact common contacts and keep only the domain of links.', notesPlaceholder: 'Official role page, confirmation date, or how you contacted the employer…',
   questions: 'Prepare questions for the employer', questionsHint: 'Use contact details you found independently.', questionsLabel: 'QUESTIONS FOR THE OFFICIAL CONTACT', copyQuestions: 'Copy questions',
@@ -33,12 +34,13 @@ Object.assign(translations.en, {
   domainMismatch: (a,b) => `The sender domain ${a} differs from ${b}. An agency or hiring portal may use a different domain; confirm the connection through the company’s official contact.`
 });
 Object.assign(translations.zh, {
+  privateDesign: '注重隐私', recoveryJump: '已经付款或发了资料？查看补救步骤 ↓',
   tryExample: '试试虚构示例', recoveryCountry: '所在国家的官方求助渠道', chooseCountry: '选择所在国家', countryMY: '马来西亚', countrySG: '新加坡', countryUS: '美国', countryOther: '其他国家', officialHelp: '官方指引 ↗',
   recoveryMY: '马来西亚：立即联系银行。拨打 NSRC 997 寻求网络金融诈骗的紧急响应。', recoverySG: '新加坡：立即联系银行。拨打 ScamShield 1799 获取建议及举报指引。', recoveryUS: '美国：立即联系银行或支付平台，并向 FTC 举报。如已泄露身份资料，可使用 IdentityTheft.gov。', recoveryOther: '立即联系银行或支付平台，并独立查找所在国家的警方或政府官方诈骗举报渠道。',
   taskSample: '任务兼职 ↗', continueCheck: '继续独立核验 ↓', messageEvidence: '查看完整原文和高亮',
   missingSite: '你已标记完成核验，请填写独立找到的官网，以完成这份记录。', invalidInputs: '完成记录之前，请先修正上方的邮箱或官网地址。',
   limit: '这次粘贴超过20,000字，请缩短后重新粘贴。原有内容未被替换。',
-  skip: '跳到邀约检查', reset: '清空本次核验', resetConfirm: '清空这个标签页中的邀约、勾选项和笔记？', cleared: '本次核验已清空。', changed: '原文已修改，请重新检查以更新结果。',
+  skip: '跳到邀约检查', reset: '清空本次核验', resetConfirm: '清空这个标签页中的邀约、勾选项和笔记？', replaceConfirm: '用这个虚构示例替换你填写的邀约和核验笔记？', cleared: '本次核验已清空。', changed: '原文已修改，请重新检查以更新结果。',
   export: '查看及导出核验记录 ↓', download: '下载 .txt', copyRecord: '复制记录', copied: '已复制。', copyFallback: '文字已选中，请按 Ctrl+C 或 ⌘C 复制。', reviewBeforeSharing: '分享前请检查这份记录，自动遮盖的范围有限。',
   recordPreviewLabel: '核验记录 — 分享前请检查', notesSummary: '添加核验证据笔记（选填）', notesLabel: '你核实了什么？', notesHint: '笔记只留在这个标签页。不要填证件号码或密码。导出时会遮盖常见联系方式，链接只保留域名。', notesPlaceholder: '官方岗位页面、确认日期，或你联系雇主的方式……',
   questions: '准备向雇主核实的问题', questionsHint: '请使用独立找到的联系方式。', questionsLabel: '发给官方联系人的问题', copyQuestions: '复制问题',
@@ -89,6 +91,9 @@ function setLanguage(next) {
   $('results').setAttribute('aria-label', next === 'en' ? 'Analysis results' : '检查结果');
   $('verify').setAttribute('aria-label', next === 'en' ? 'Independent verification' : '独立核验');
   $('highlightedMessage').setAttribute('aria-label', next === 'en' ? 'Message evidence' : '原文证据');
+  document.querySelector('.workspace').setAttribute('aria-label', next === 'en' ? 'Offer verification workspace' : '邀约核验区域');
+  document.querySelector('.side-note').setAttribute('aria-label', next === 'en' ? 'Before you begin' : '开始之前');
+  $('recovery').setAttribute('aria-label', next === 'en' ? 'If you already acted' : '如果你已经付款或发送资料');
   $('questionsText').value = t().questionTemplate;
   $('questionsStatus').textContent = '';
   if ($('inputStatus').dataset.key) inputFeedback($('inputStatus').dataset.key);
@@ -99,7 +104,11 @@ function setLanguage(next) {
   if (hadRecord && currentAnalysis) prepareRecord(false);
 }
 
-function setSample(kind) {
+function setSample(kind, confirmed = false) {
+  const message = $('offerText').value;
+  const isExample = Object.values(samples).some(group => Object.values(group).includes(message));
+  const hasUserContent = $('evidenceNotes').value.trim() || (message.trim() && !isExample);
+  if (!confirmed && hasUserContent && !window.confirm(t().replaceConfirm)) return;
   currentAnalysis = null;
   analyzedText = '';
   $('evidenceNotes').value = '';
@@ -282,7 +291,7 @@ function renderRecovery() {
 
 function resetReview() {
   if (($('offerText').value || $('evidenceNotes').value) && !window.confirm(t().resetConfirm)) return;
-  setSample('ordinary');
+  setSample('ordinary', true);
   ['offerText', 'senderEmail', 'officialSite'].forEach(id => { $(id).value = ''; });
   syncVerificationInputs();
   updateCount();

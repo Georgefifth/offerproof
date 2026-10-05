@@ -14,7 +14,7 @@ It never declares an offer safe or fraudulent. When no phrases match, it still a
 
 ## How we built it
 
-We used HTML, CSS, and JavaScript modules with no external runtime dependencies. The detection rules run locally in the browser. The interface is available in English and Chinese. The core flow needs no login, API key, or network request. The downloaded report is generated in the browser and omits the full pasted message.
+We used HTML, CSS, and JavaScript modules with no external runtime dependencies. The detection rules run locally in the browser. The interface is available in English and Chinese. The core flow needs no login, API key, or network request. The downloaded report is generated in the browser and includes matching excerpts rather than a separate copy of the full message.
 
 ## Challenges
 
@@ -30,7 +30,7 @@ The OfferProof prototype in this directory: bilingual interface, local phrase an
 
 ## Built with
 
-HTML, CSS, JavaScript. Development checks use the Node.js test runner, Playwright Firefox, axe-core, and GitHub Actions. The 58 analysis/report regression examples are synthetic; automated accessibility checks cover four page states. No measured real-world detection accuracy or user study is claimed.
+HTML, CSS, JavaScript. Development checks use the Node.js test runner, Playwright Firefox, axe-core, and GitHub Actions. The 66 analysis/report regression examples are synthetic; automated accessibility checks cover four page states. No measured real-world detection accuracy or user study is claimed.
 
 **Working prototype:** https://georgefifth.github.io/offerproof/
 

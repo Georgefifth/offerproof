@@ -17,8 +17,9 @@ const server = createServer(async (req, res) => {
   res.end(await readFile(join(project, name)));
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-const base = `http://127.0.0.1:${server.address().port}/`;
-const output = join(project, 'test-artifacts');
+const remoteBase = process.env.OFFERPROOF_BASE_URL;
+const base = remoteBase || `http://127.0.0.1:${server.address().port}/`;
+const output = join(project, 'test-artifacts', remoteBase ? 'live' : '');
 await mkdir(output, { recursive: true });
 const browser = await firefox.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true });
@@ -44,6 +45,9 @@ try {
   assert.equal(await page.locator('.skip-link').evaluate(el => el === document.activeElement), true);
   await page.keyboard.press('Enter');
   assert.equal(await page.locator('#offerText').evaluate(el => el === document.activeElement), true);
+  await page.locator('a[href="#recovery"]').click();
+  assert.equal(new URL(page.url()).hash, '#recovery');
+  assert.equal(await page.locator('#recovery').evaluate(el => el === document.activeElement), true);
   await audit('initial desktop');
 
   await page.locator('#analyzeBtn').click();
@@ -174,6 +178,11 @@ try {
   assert.deepEqual(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })), { local: 0, session: 0 });
 
   await page.setViewportSize({ width: 390, height: 844 });
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.locator('#loadRisky').click();
+  assert.match(await page.locator('#offerText').inputValue(), /window.testXss/);
+  assert.equal(await page.locator('#results').isVisible(), true);
+  page.once('dialog', dialog => dialog.accept());
   await page.locator('#loadRisky').click();
   await page.locator('#analyzeBtn').click();
   await page.screenshot({ path: `${output}/firefox-risky-mobile.png`, fullPage: true });
@@ -204,7 +213,7 @@ try {
   assert.equal(await page.locator('#messageEvidence').getAttribute('open'), null);
   await page.locator('#messageEvidence summary').click();
   assert.equal(await page.locator('#highlightedMessage').isVisible(), true);
-  await page.locator('.next-step').click();
+  await page.locator('a[href="#verify"]').click();
   assert.equal(new URL(page.url()).hash, '#verify');
   await page.locator('#langToggle').click();
   await page.locator('#offerText').fill('Pay the equipment fee. '.repeat(800));

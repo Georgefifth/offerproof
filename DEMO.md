@@ -10,7 +10,7 @@ This is a recording script, not a claim that a video has been recorded.
 
 **1:25–2:05 — Verify.** Scroll to the domain comparison. Explain that the sample sender uses a personal email. Show the three steps: find the employer’s website independently, confirm the specific position, and contact the employer through its official contact details. Do not tick the boxes in the suspicious sample unless you actually performed those checks.
 
-**2:05–2:30 — Record and contrast.** Open **Review & export record** and show the preview before downloading. Explain that it omits the complete message and masks common contact details. Then load the ordinary sample and analyze it. Point out that no listed warning phrases were found, but independent verification is still required; the app never labels an offer “safe.”
+**2:05–2:30 — Record and contrast.** Open **Review & export record** and show the preview before downloading. Explain that it exports matching excerpts and masks common contact details. Then load the ordinary sample and analyze it. Point out that no listed warning phrases were found, but independent verification is still required; the app never labels an offer “safe.”
 
 **2:30–2:45 — Close.** “OfferProof helps students pause, identify the exact request, and verify outside the suspicious message. It does not replace an employer or fraud authority.”
 
