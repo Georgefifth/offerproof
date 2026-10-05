@@ -1,5 +1,9 @@
 # OfferProof
 
+## Product restart
+
+The new [PackCheck core prototype](https://georgefifth.github.io/offerproof/packcheck/) performs a different task: preparing a real submission ZIP from local files, with editable paths and explicit requirement checks. OfferProof is retained below as the prior prototype. See [PackCheck research and limits](./packcheck/RESEARCH.md).
+
 OfferProof helps students pause and independently verify job or internship invitations. The browser prototype highlights exact phrases associated with known scam patterns, compares an email domain with a company website the user found independently, and makes a self-reported verification checklist and downloadable record.
 
 ## Run
